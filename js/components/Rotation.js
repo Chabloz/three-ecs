@@ -1,17 +1,16 @@
-import Component from '../Component.js';
+import Component from './Component.js';
 
 export default class Rotation extends Component {
 
-  init({r}) {
-    this.r = r;
-    this.removeListener = this.entity.addListener('test-event', () => {
-      console.log(this.r)
-      this.entity.removeComponent(this);
-    })
+  init({x = null, y = null, z = null} = {}) {
+    const rot = this.entity.object3D.rotation;
+    if (x != null) rot.x = x;
+    if (y != null) rot.y = y;
+    if (z != null) rot.z = z;
   }
 
   remove() {
-    this.removeListener();
+
   }
 
 }

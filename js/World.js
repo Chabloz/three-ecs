@@ -1,4 +1,4 @@
-import Entity from './Entity.js';
+import Entity from './entities/Entity.js';
 
 export default class World {
   #entitiesSet

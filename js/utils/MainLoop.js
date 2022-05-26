@@ -18,12 +18,14 @@ export default class MainLoop {
     this.frameDelta = 0;
     this.numUpdate = 0;
 
-    this.registred = new Set();
+    this.registredUpdate = new Set();
+    this.registredRender = new Set();
+    // todo resgisterRenderInterpolated
 
-    if (autopause) this._addListenerAutoPause();
+    if (autopause) this.addListenerAutoPause();
   }
 
-  _addListenerAutoPause() {
+  addListenerAutoPause() {
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && this.isRunning()) {
         this.stop();
@@ -33,12 +35,22 @@ export default class MainLoop {
     });
   }
 
-  register(callback) {
-    return this.registred.add(callback);
+  registerUpdate(callback) {
+    this.registredUpdate.add(callback);
+    return () => this.unregisterUpdate(callback);
   }
 
-  unregister(callback) {
-    return this.registred.delete(callback);
+  unregisterUpdate(callback) {
+    return this.registredUpdate.delete(callback);
+  }
+
+  registerRender(callback) {
+    this.registredRender.add(callback);
+    return () => this.unregisterRender(callback);
+  }
+
+  unregisterRender(callback) {
+    return this.registredRender.delete(callback);
   }
 
   start() {
@@ -51,7 +63,6 @@ export default class MainLoop {
   stop() {
     cancelAnimationFrame(this.loop);
     this.loop = null;
-    // todo save diff elaspedtime et now pour repartir de cette valeur précise
   }
 
   toggle() {
@@ -80,7 +91,8 @@ export default class MainLoop {
     this.numUpdate = 0;
     while (this.frameDelta >= this.timestep && this.numUpdate <= this.updatePerSec) {
       this.elapsedTime += this.timestep;
-      for (this.callback of this.registred) {
+
+      for (this.callback of this.registredUpdate) {
         this.callback(this.timestep, this.elapsedTime);
       }
       this.frameDelta -= this.timestep;
@@ -90,6 +102,13 @@ export default class MainLoop {
     // We run the update loop for more than 1 second !
     if (this.numUpdate > this.updatePerSec) {
       this.panic(this.frameDelta); // by default this will reset the frameDelta
+    }
+
+    // call all registred render callback (only if atleast one update has been made)
+    if (this.numUpdate > 0) {
+      for (this.callback of this.registredRender) {
+        this.callback();
+      }
     }
   }
 
