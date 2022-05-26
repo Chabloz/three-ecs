@@ -1,5 +1,4 @@
 import Entity from '../entities/Entity.js';
-import * as THREE from '../lib/three/build/three.module.js';
 
 export default class World {
   #entitiesSet
@@ -9,16 +8,19 @@ export default class World {
   }
 
   create({id = null, components = []} = {}) {
-    const e = new Entity({id, world: this});
+    const entity = new Entity({id, world: this});
+
     for (let componentParam of components) {
+      // handle the special case of a no args component
       if (!Array.isArray(componentParam)) {
         componentParam = [componentParam, {}];
       }
       const [component, args] = componentParam;
-      e.addComponent(component, args);
+      entity.addComponent(component, args);
     }
-    this.add(e);
-    return e;
+
+    this.add(entity);
+    return entity;
   }
 
   add(entities) {
@@ -33,6 +35,8 @@ export default class World {
     if (!Array.isArray(entities)) entities = [entities];
     for (const entity of entities) {
       if (this.#entitiesSet.delete(entity)) {
+        // emit a "removed" event on the entity (usefull for others entities that are listening to this one)
+        entity.emit('removed', {world: this});
         entity.remove();
       }
     }

@@ -19,7 +19,6 @@ export default class Entity {
         component.remove();
       }
     }
-    // remove all listeners ?
   }
 
   addListener(event, callback) {
@@ -41,11 +40,11 @@ export default class Entity {
     callbackSet.delete(callback);
   }
 
-  emit(event) {
+  emit(event, data = {}) {
     const callbackSet = this.#listeners.get(event);
     if (!callbackSet) return;
     for (const callback of callbackSet) {
-      callback(this);
+      callback({entity: this, ...data});
     }
   }
 
@@ -125,13 +124,17 @@ export default class Entity {
 
   getComponent(className) {
     const componentSet = this.#components.get(className);
-    if (!componentSet) return false;
-    // if this there is a unique component for this type, get it
+    if (!componentSet) {
+      throw `No ${className} component on the entity`;
+    }
+
+    // if there is only one component in the set, we return it
     if (componentSet.size == 1) {
-      var setIter = componentSet.values();
+      const setIter = componentSet.values();
       return setIter.next().value;
     }
-    // otherwise return all multiple component as a set
+
+    // otherwise return the set of all components of the same class
     return this.#components.get(className);
   }
 

@@ -14,13 +14,12 @@ export default class ThreeEntity extends Entity {
     parent.add(this.#group);
   }
 
-  //todo iterator function to loop over all mesh in the group ?
-
   remove() {
     super.remove();
     this.parent.remove(this.#group);
   }
 
+  // Think of all those is needed, or a sinmple unique mesh is enough
   setObject3D(object3D, name = 'mesh') {
     // if allready a object3D with this name, remove it first
     if (this.#groupMap.has(name)) {
@@ -31,14 +30,16 @@ export default class ThreeEntity extends Entity {
     this.#groupMap.set(name, object3D);
   }
 
+  removeObject3D(name = 'mesh') {
+    return this.#group.remove(this.#groupMap.get(name));
+  }
+
   getObject3D(name = 'mesh') {
     return this.#groupMap.get(name);
   }
 
-  // By default take the 'mesh' named object3D of the group
   get object3D() {
     return this.#group;
-    //return this.#groupMap.get('mesh');
   }
 
   set object3D(object3D) {

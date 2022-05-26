@@ -3,21 +3,32 @@ import Position from './components/Position.js';
 import Rotation from './components/Rotation.js';
 import Box from './components/Box.js';
 import LookAt from './components/LookAt.js';
+import ListenTo from './components/ListenTo.js';
 
 import mainloop from './systems/MainLoop.js';
 
 const world = new World();
 
-const e1 = world.create({
-  id: 'cube1',
+const e0 = world.create({
   components: [
     Box,
     [Rotation, {x:2 , z: 2}],
-    [Position, {x:2 , z: 2}]
+    [Position, {x:-2 , z: 2}]
   ]
 });
-e1.addComponent(LookAt, {target: world.camera});
-console.log(e1);
+
+const e1 = world.create({
+  components: [
+    Box,
+    [Rotation, {x:2 , z: 2}],
+    [Position, {x:2 , z: 2}],
+    [ListenTo, {targetEntity: e0}]
+  ]
+});
+// e1.addComponent(LookAt, {target: world.camera});
+
+// e0.getComponent('Box').remove();
+// world.remove(e0);
 
 mainloop.registerRender(() => world.render());
 mainloop.start();
