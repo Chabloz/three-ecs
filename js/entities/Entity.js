@@ -5,18 +5,21 @@ export default class Entity {
   #components
   #listeners
 
-  constructor(id = null) {
+  constructor({id = null, world}) {
     this.id = id ?? generateUUID();
     this.#components = new Map();
     this.#listeners = new Map();
+    this.world = world;
   }
 
   remove() {
+    // call the remove method of all the components used by this entity
     for (const [classname, componentSet] of this.#components) {
       for (const component of componentSet) {
         component.remove();
       }
     }
+    // remove all listeners ?
   }
 
   addListener(event, callback) {
@@ -46,12 +49,12 @@ export default class Entity {
     }
   }
 
-  get components() {
-    return this.#components;
-  }
+  addComponent(TheComponent, args = {}) {
+    const component = new TheComponent(this);
+    if (!(component instanceof Component)) {
+      throw 'The component is not an instance of Component';
+    }
 
-  addComponent(Component, args = {}) {
-    const component = new Component(this);
     let componentSet = this.#components.get(component.className);
 
     // If it is the first component of this type, we create a set storage
@@ -121,6 +124,14 @@ export default class Entity {
   }
 
   getComponent(className) {
+    const componentSet = this.#components.get(className);
+    if (!componentSet) return false;
+    // if this there is a unique component for this type, get it
+    if (componentSet.size == 1) {
+      var setIter = componentSet.values();
+      return setIter.next().value;
+    }
+    // otherwise return all multiple component as a set
     return this.#components.get(className);
   }
 

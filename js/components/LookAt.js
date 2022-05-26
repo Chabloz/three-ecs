@@ -11,6 +11,10 @@ export default class LookAt extends Component {
     mainloop.registerUpdate(this.tick);
   }
 
+  update({target}) {
+    this.target = target;
+  }
+
   remove() {
     mainloop.unregisterUpdate(this.tick);
   }

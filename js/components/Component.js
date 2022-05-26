@@ -12,6 +12,10 @@ export default class Component {
 
   }
 
+  update(args) {
+
+  }
+
   remove() {
 
   }

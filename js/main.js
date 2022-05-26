@@ -1,37 +1,25 @@
-import World from './World.js';
-import Entity from './entities/Entity.js';
-import ThreeEntity from './entities/ThreeEntity.js';
+import World from './worlds/ThreeWorld.js';
 import Position from './components/Position.js';
 import Rotation from './components/Rotation.js';
-import Geometry from './components/Geometry.js';
+import Box from './components/Box.js';
 import LookAt from './components/LookAt.js';
-
-import * as THREE from './lib/three/build/three.module.js';
 
 import mainloop from './systems/MainLoop.js';
 
 const world = new World();
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const e1 = world.create({
+  id: 'cube1',
+  components: [
+    Box,
+    [Rotation, {x:2 , z: 2}],
+    [Position, {x:2 , z: 2}]
+  ]
+});
+e1.addComponent(LookAt, {target: world.camera});
+console.log(e1);
 
-const cube1 = new ThreeEntity({parent: scene});
-cube1.addComponent(Geometry);
-cube1.addComponent(Rotation, {x:2 , z: 2});
-cube1.addComponent(Position, {x:2 , z: 2});
-cube1.addComponent(LookAt, {target: camera});
-
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-
-camera.position.z = 5;
-
-function render() {
-  renderer.render( scene, camera );
-}
-
-mainloop.registerRender(render);
+mainloop.registerRender(() => world.render());
 mainloop.start();
 
 

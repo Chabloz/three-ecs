@@ -4,13 +4,13 @@ import * as THREE from '../lib/three/build/three.module.js';
 export default class ThreeEntity extends Entity {
   #groupMap
   #group
-  #parent
+  parent
 
-  constructor({id = null, parent}) {
-    super(id);
+  constructor({id = null, parent, world}) {
+    super({id, world});
     this.#group = new THREE.Group();
     this.#groupMap = new Map();
-    this.#parent = parent;
+    this.parent = parent;
     parent.add(this.#group);
   }
 
@@ -18,7 +18,7 @@ export default class ThreeEntity extends Entity {
 
   remove() {
     super.remove();
-    this.#parent.remove(this.#group);
+    this.parent.remove(this.#group);
   }
 
   setObject3D(object3D, name = 'mesh') {

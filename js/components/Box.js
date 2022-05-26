@@ -1,7 +1,7 @@
 import Component from './Component.js';
 import * as THREE from '../lib/three/build/three.module.js';
 
-export default class Geometry extends Component {
+export default class Box extends Component {
 
   init({}) {
     const geometry = new THREE.BoxGeometry();
