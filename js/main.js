@@ -18,7 +18,6 @@ const e0 = world.create(
 
 const e1 = world.create(
   [HexagonTesselation, {radius: 10}, 'tesselation1'], // todo Make it an object instead of an array ?
-  [HexagonTesselation, {radius: 11}],
   Box,
   [Rotation, {x:2 , z: 2}],
   [Position, {x:0 , z: -4}],
@@ -35,9 +34,16 @@ const camera = world.create(
 setTimeout(() => {
   // camera.getComponent('Camera').update({active: true});
   // e0.emit('click');
+  e1.addComponent(LookAt, {target: camera});
 }, 2000);
 
+setTimeout(() => {
+  // camera.getComponent('Camera').update({active: true});
+  // e0.emit('click');
+  e1.removeComponent("Box");
+}, 4000);
+
 // e1.addComponent(LookAt, {target: e0});
-e1.addComponent(LookAt, {target: camera});
+
 
 world.start();

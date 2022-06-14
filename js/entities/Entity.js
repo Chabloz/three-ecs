@@ -93,6 +93,7 @@ export default class Entity {
     return res;
   }
 
+  //TODO and remove by id ?
   removeComponentByClassName(className) {
     const componentSet = this.#components.get(className);
     if (!componentSet) return false;
