@@ -35,12 +35,12 @@ export default class MainLoop {
     });
   }
 
-  registerUpdate(callback) {
+  register(callback) {
     this.registredUpdate.add(callback);
-    return () => this.unregisterUpdate(callback);
+    return () => this.unregister(callback);
   }
 
-  unregisterUpdate(callback) {
+  unregister(callback) {
     return this.registredUpdate.delete(callback);
   }
 

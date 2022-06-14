@@ -48,8 +48,8 @@ export default class Entity {
     }
   }
 
-  addComponent(TheComponent, args = {}) {
-    const component = new TheComponent(this);
+  addComponent(TheComponent, args = {}, id) {
+    const component = new TheComponent(this, id);
     if (!(component instanceof Component)) {
       throw 'The component is not an instance of Component';
     }
@@ -64,7 +64,7 @@ export default class Entity {
     }
 
     componentSet.add(component);
-    component.init(args)
+    component.init(args);
 
     return component;
   }
@@ -75,7 +75,7 @@ export default class Entity {
       return this.removeComponentByClassName(component);
     }
 
-    // Otherwise delet the specific component
+    // Otherwise delete the specific component
     const componentSet = this.#components.get(component.className);
     if (!componentSet) return false;
 
@@ -133,6 +133,8 @@ export default class Entity {
       const setIter = componentSet.values();
       return setIter.next().value;
     }
+
+    //TODO get by id
 
     // otherwise return the set of all components of the same class
     return this.#components.get(className);

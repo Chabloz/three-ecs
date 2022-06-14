@@ -1,88 +1,43 @@
 import World from './worlds/ThreeWorld.js';
 import Position from './components/Position.js';
 import Rotation from './components/Rotation.js';
+import HexagonTesselation from './components/HexagonTesselation.js';
+import LightAmbient from './components/LightAmbient.js';
 import Box from './components/Box.js';
+import Camera from './components/Camera.js';
 import LookAt from './components/LookAt.js';
 import ListenTo from './components/ListenTo.js';
 
-import mainloop from './systems/MainLoop.js';
-
 const world = new World();
 
-const e0 = world.create({
-  components: [
-    Box,
-    [Rotation, {x:2 , z: 2}],
-    [Position, {x:-2 , z: 2}]
-  ]
-});
+const e0 = world.create(
+  Box,
+  [Rotation, {x:2 , z: 2}],
+  [Position, {x:-2 , z: -4}]
+);
 
-const e1 = world.create({
-  components: [
-    Box,
-    [Rotation, {x:2 , z: 2}],
-    [Position, {x:2 , z: 2}],
-    [ListenTo, {targetEntity: e0}]
-  ]
-});
-// e1.addComponent(LookAt, {target: world.camera});
+const e1 = world.create(
+  [HexagonTesselation, {radius: 10}, 'tesselation1'], // todo Make it an object instead of an array ?
+  [HexagonTesselation, {radius: 11}],
+  Box,
+  [Rotation, {x:2 , z: 2}],
+  [Position, {x:0 , z: -4}],
+  [ListenTo, {targetEntity: e0}]
+);
+e1.addListener('click', () => console.log('clicked'));
+console.log(e1.getComponent('HexagonTesselation')); // Todo make it by classname ? and by id.
 
-// e0.getComponent('Box').remove();
-// world.remove(e0);
+const camera = world.create(
+  [Camera, {active: false}],
+  [Position, {z: 8}],
+);
 
-mainloop.registerRender(() => world.render());
-mainloop.start();
+setTimeout(() => {
+  // camera.getComponent('Camera').update({active: true});
+  // e0.emit('click');
+}, 2000);
 
+// e1.addComponent(LookAt, {target: e0});
+e1.addComponent(LookAt, {target: camera});
 
-
-// mainloop.start();
-
-// const e1 = new Entity();
-// const c1 = e1.addComponent(Position, { x: 1, y: 1 });
-// const c2 = e1.addComponent(Position, { x: 2, y: 2 });
-// const c3 = e1.addComponent(Rotation, { r: 3 });
-// world.add(e1);
-
-// const e2 = new Entity();
-// e2.addComponent(Position, { x: 3, y: 3 });
-// e2.addComponent(Rotation, { r: 4 });
-// world.add(e2);
-
-// console.log(e2);
-
-// const scene = new THREE.Scene();
-// const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-// const renderer = new THREE.WebGLRenderer();
-// renderer.setSize( window.innerWidth, window.innerHeight );
-// document.body.appendChild( renderer.domElement );
-
-// const geometry = new THREE.BoxGeometry();
-// const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-
-
-// const e3 = new ThreeEntity('my-box', scene);
-// e3.addComponent(Geometry, {});
-// e3.addComponent(LookAt, {target: camera});
-
-// world.add(e3);
-// setTimeout(() => {
-//   world.remove(e3);
-// }, 2000);
-
-
-// const cube = new THREE.Mesh( geometry, material );
-// const cube2 = new THREE.Mesh( new THREE.BoxGeometry(), new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
-// scene.add( cube );
-// scene.add( cube2 );
-
-// camera.position.z = 5;
-
-// function animate() {
-//   requestAnimationFrame( animate );
-
-//   renderer.render( scene, camera );
-// };
-
-// animate();
-
+world.start();

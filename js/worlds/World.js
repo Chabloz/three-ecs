@@ -7,16 +7,21 @@ export default class World {
     this.#entitiesSet = new Set();
   }
 
-  create({id = null, components = []} = {}) {
+  create(...components) {
+    return this.createEntity({components});
+  }
+
+  createEntity({id = null, components = []} = {}) {
     const entity = new Entity({id, world: this});
 
     for (let componentParam of components) {
       // handle the special case of a no args component
       if (!Array.isArray(componentParam)) {
-        componentParam = [componentParam, {}];
+        componentParam = [componentParam, {}, undefined];
       }
-      const [component, args] = componentParam;
-      entity.addComponent(component, args);
+      const [component, args, id] = componentParam;
+
+      entity.addComponent(component, args, id);
     }
 
     this.add(entity);
@@ -44,13 +49,6 @@ export default class World {
 
   has(entity) {
     return this.#entitiesSet.has(entity);
-  }
-
-  // TODO: call draw only in Render system
-  draw(ctx) {
-    for (const entity of this.#entitiesSet) {
-      entity.draw(ctx);
-    }
   }
 
 }

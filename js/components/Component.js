@@ -1,7 +1,10 @@
+import { generateUUID } from '../utils/Math.js';
+
 export default class Component {
 
-  constructor(entity) {
+  constructor(entity, id) {
     this.entity = entity;
+    this.id = id ?? generateUUID();
   }
 
   get className() {

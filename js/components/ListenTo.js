@@ -7,13 +7,8 @@ export default class ListenTo extends Component {
     this.eventOnSelf = eventOnSelf;
     this.event = event;
 
-    this.onEvent = this.onEvent.bind(this);
-    this.onTargetRemoved = this.onTargetRemoved.bind(this);
-
-    // when the target entity is removed, remove the reference here
-    // (to let the garbage collection do his job)
-    this.remListenerRemove = this.targetEntity.addListener('removed', this.onTargetRemoved);
-    this.remlistener = this.targetEntity.addListener(this.event, this.onEvent);
+    this.remListenerRemove = this.targetEntity.addListener('removed', () => this.onTargetRemoved());
+    this.remlistener = this.targetEntity.addListener(this.event, () => this.onEvent());
   }
 
   update({targetEntity = null, event = null, eventOnSelf = null}) {
@@ -31,8 +26,8 @@ export default class ListenTo extends Component {
     if (mustRebind) {
       this.remListenerRemove();
       this.remlistener();
-      this.remListenerRemove = this.targetEntity.addListener('removed', this.onTargetRemoved);
-      this.remlistener = this.targetEntity.addListener(this.event, this.onEvent);
+      this.remListenerRemove = this.targetEntity.addListener('removed', () => this.onTargetRemoved());
+      this.remlistener = this.targetEntity.addListener(this.event, () => this.onEvent);
     }
   }
 

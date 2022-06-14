@@ -5,10 +5,9 @@ import mainloop from "../systems/MainLoop.js";
 export default class LookAt extends Component {
 
   init({target}) {
-    this.target = target;
-    this.tick = this.tick.bind(this);
+    this.target = target.object3D;
     this.targetWorldPosition = new THREE.Vector3();
-    mainloop.registerUpdate(this.tick);
+    this.unregister = mainloop.register((dt, t) => this.tick(dt, t));
   }
 
   update({target}) {
@@ -16,7 +15,8 @@ export default class LookAt extends Component {
   }
 
   remove() {
-    mainloop.unregisterUpdate(this.tick);
+    this.unregister();
+    this.unregister = null;
   }
 
   tick(dt, t) {

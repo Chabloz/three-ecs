@@ -1,47 +1,75 @@
 import ThreeEntity from "../entities/ThreeEntity.js";
 import World from "./World.js";
-import * as THREE from '../lib/three/build/three.module.js';
+import {Scene, WebGLRenderer, PerspectiveCamera, Color} from '../lib/three/build/three.module.js';
+
+// some default system for the World:
+import mainloop from '../systems/MainLoop.js';
 
 export default class ThreeWorld extends World {
 
-  constructor() {
+  constructor({
+    autoResize = true,
+    backgroundColor = 'white',
+  } = {}) {
     super();
 
-    this.scene = new THREE.Scene();
-    this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setPixelRatio(window.devicePixelRatio)
-
-    // todo make a camera component (and use the active cam as the scene cam)
-    this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    this.camera.position.z = 5;
+    this.autoResize = autoResize;
+    this.scene = new Scene();
+    this.scene.background = new Color(backgroundColor);
+    this.renderer = new WebGLRenderer();
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.setDefautlCamera();
 
     document.body.appendChild(this.renderer.domElement);
+    mainloop.registerRender(() => this.render());
+  }
 
-    window.addEventListener( 'resize', () => {
+  setDefautlCamera() {
+    this.activeCamera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    if (!this.autoResize) return;
+    window.addEventListener('resize', () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      this.camera.aspect = width / height;
-      this.camera.updateProjectionMatrix();
+      this.activeCamera.aspect = width / height;
+      this.activeCamera.updateProjectionMatrix();
       this.renderer.setSize(width, height);
     });
-    window.dispatchEvent(new Event('resize'));
+  }
+
+  getCamera() {
+    return this.activeCamera;
+  }
+
+  setCamera(camera) {
+    this.activeCamera = camera;
+  }
+
+  start() {
+    if (this.autoResize) window.dispatchEvent(new Event('resize'));
+    mainloop.start();
   }
 
   render() {
-    this.renderer.render( this.scene, this.camera );
+    this.renderer.render(this.scene, this.activeCamera);
   }
 
-  create({id = null, components = [], parent = null} = {}) {
-    const e = new ThreeEntity({id, parent: parent ?? this.scene, world: this});
+  create(...components) {
+    return this.createEntity({components});
+  }
+
+  createEntity({id = null, components = [], parent = null} = {}) {
+    const entity = new ThreeEntity({id, parent: parent ?? this.scene, world: this});
+
     for (let componentParam of components) {
       if (!Array.isArray(componentParam)) {
-        componentParam = [componentParam, {}];
+        componentParam = [componentParam, {}, undefined];
       }
-      const [component, args] = componentParam;
-      e.addComponent(component, args);
+      const [component, args, id] = componentParam;
+      entity.addComponent(component, args, id);
     }
-    this.add(e);
-    return e;
+
+    this.add(entity);
+    return entity;
   }
 
 
