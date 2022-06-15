@@ -17,14 +17,14 @@ const e0 = world.create(
 );
 
 const e1 = world.create(
-  [HexagonTesselation, {radius: 10}, 'tesselation1'], // todo Make it an object instead of an array ?
+  [HexagonTesselation, {radius: 10}],
   Box,
   [Rotation, {x:2 , z: 2}],
   [Position, {x:0 , z: -4}],
   [ListenTo, {targetEntity: e0}]
 );
 e1.addListener('click', () => console.log('clicked'));
-console.log(e1.getComponent('HexagonTesselation')); // Todo make it by classname ? and by id.
+
 
 const camera = world.create(
   [Camera, {active: false}],
@@ -40,7 +40,7 @@ setTimeout(() => {
 setTimeout(() => {
   // camera.getComponent('Camera').update({active: true});
   // e0.emit('click');
-  e1.removeComponent("Box");
+  e1.removeComponent(Box);
 }, 4000);
 
 // e1.addComponent(LookAt, {target: e0});

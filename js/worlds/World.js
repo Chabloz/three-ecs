@@ -13,19 +13,20 @@ export default class World {
 
   createEntity({id = null, components = []} = {}) {
     const entity = new Entity({id, world: this});
+    this._addComponentsToEntity(entity, components);
+    this.add(entity);
+    return entity;
+  }
 
+  _addComponentsToEntity(entity, components) {
     for (let componentParam of components) {
       // handle the special case of a no args component
       if (!Array.isArray(componentParam)) {
         componentParam = [componentParam, {}, undefined];
       }
       const [component, args, id] = componentParam;
-
       entity.addComponent(component, args, id);
     }
-
-    this.add(entity);
-    return entity;
   }
 
   add(entities) {

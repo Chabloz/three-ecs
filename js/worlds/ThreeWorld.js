@@ -53,21 +53,9 @@ export default class ThreeWorld extends World {
     this.renderer.render(this.scene, this.activeCamera);
   }
 
-  create(...components) {
-    return this.createEntity({components});
-  }
-
   createEntity({id = null, components = [], parent = null} = {}) {
     const entity = new ThreeEntity({id, parent: parent ?? this.scene, world: this});
-
-    for (let componentParam of components) {
-      if (!Array.isArray(componentParam)) {
-        componentParam = [componentParam, {}, undefined];
-      }
-      const [component, args, id] = componentParam;
-      entity.addComponent(component, args, id);
-    }
-
+    this._addComponentsToEntity(entity, components);
     this.add(entity);
     return entity;
   }
