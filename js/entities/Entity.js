@@ -12,12 +12,19 @@ export default class Entity {
     this.world = world;
   }
 
+   /**
+   * Returns a new Iterator object on all the components of the entity.
+   */
+  *components() {
+    for (const componentSet of this.#components.values()) {
+      for (const component of componentSet) yield component;
+    }
+  }
+
   remove() {
-    // call the remove method of all the components used by this entity
-    for (const [classname, componentSet] of this.#components) {
-      for (const component of componentSet) {
-        component.remove();
-      }
+    // call the remove method of all the components on removal
+    for (const component of this.components()) {
+      component.remove();
     }
   }
 
@@ -122,18 +129,15 @@ export default class Entity {
   }
 
   removeComponentById(id) {
-    for (const componentSet of this.#components.values()) {
-      for (const component of componentSet) {
-        if (component.id == id) {
-          return this.removeComponent(component);
-        }
+    for (const component of this.components()) {
+      if (component.id == id) {
+        return this.removeComponent(component);;
       }
     }
     return false;
   }
 
   hasComponent(component) {
-    // if we are removing by class name, remove all componants of this class
     if (component instanceof Component) {
       return this.hasComponentInstance(component);
     }
@@ -147,19 +151,14 @@ export default class Entity {
   }
 
   hasComponentInstance(component) {
-    //if we are checking if a component is in there, get the set and check
     const componentSet = this.#components.get(component.className);
     if (!componentSet) return false;
     return componentSet.has(component);
   }
 
   hasComponentId(id) {
-    for (const componentSet of this.#components.values()) {
-      for (const component of componentSet) {
-        if (component.id == id) {
-          return true;
-        }
-      }
+    for (const component of this.components()) {
+      if (component.id == id) return true;
     }
     return false;
   }
@@ -173,7 +172,7 @@ export default class Entity {
   }
 
   getComponent(component) {
-    if (typeof component == 'string') { // || component instanceof String ?
+    if (typeof component == 'string') {
       return this.getComponentById(component);
     }
     if (component?.name) {
@@ -193,27 +192,47 @@ export default class Entity {
       const setIter = componentSet.values();
       return setIter.next().value;
     }
-
     // otherwise return the set of all components of the same class
     return this.#components.get(className);
   }
 
-
-
   getComponentById(id) {
-    for (const componentSet of this.#components.values()) {
-      for (const component of componentSet) {
-        if (component.id == id) {
-          return component;
-        }
-      }
+    for (const component of this.components()) {
+      if (component.id == id) return component;
     }
   }
 
-  get components() {
-    return this.#components;
+  updateComponent(component, args) {
+    if (typeof component == 'string') {
+      return this.updateComponentById(component, args);
+    }
+    if (component?.name) {
+      return this.updateComponentByClass(component, args);
+    }
+    throw 'Invalid component parameter';
   }
 
-  //todo Update component ?
+  updateComponentById(id, args) {
+    const component = this.getComponentById(id);
+    if (!component) throw `No component with this id was found`;
+    component.update(args);
+  }
+
+  updateComponentByClass(theClass, args) {
+    this.updateComponentByClassName(theClass.name, args);
+  }
+
+  updateComponentByClassName(className, args) {
+    let components = this.getComponentByClassName(className);
+    // if there is only one component update this one
+    if (components instanceof Component) {
+      components = [components];
+    }
+    if (!components) throw `No component with this id was found`;
+    // Update all compoenent of the same class
+    for (const component of components) {
+      component.update(args);
+    }
+  }
 
 }

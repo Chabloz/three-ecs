@@ -17,14 +17,13 @@ const e0 = world.create(
 );
 
 const e1 = world.create(
-  [HexagonTesselation, {radius: 10}],
+  [HexagonTesselation, {radius: 10}], // maybe make this object ?
   Box,
   [Rotation, {x:2 , z: 2}],
   [Position, {x:0 , z: -4}],
   [ListenTo, {targetEntity: e0}]
 );
-e1.addListener('click', () => console.log('clicked'));
-
+e1.addListener('click', () => console.log('e0 was clicked so me tooo'));
 
 const camera = world.create(
   [Camera, {active: false}],
@@ -32,18 +31,18 @@ const camera = world.create(
 );
 
 setTimeout(() => {
-  // camera.getComponent('Camera').update({active: true});
-  // e0.emit('click');
+  e0.emit('click');
   e1.addComponent(LookAt, {target: camera});
+}, 1000);
+
+setTimeout(() => {
+  e1.removeComponent(Box);
 }, 2000);
 
 setTimeout(() => {
-  // camera.getComponent('Camera').update({active: true});
-  // e0.emit('click');
-  e1.removeComponent(Box);
-}, 4000);
+  camera.updateComponent(Camera, {active: true});
+}, 3000);
 
 // e1.addComponent(LookAt, {target: e0});
-
 
 world.start();
