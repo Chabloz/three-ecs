@@ -1,42 +1,52 @@
 import Component from "./Component.js";
 
 export default class ListenTo extends Component {
+  #remListenerRemove
+  #remlistener
 
-  init({targetEntity, event = 'click', eventOnSelf = 'click'}) {
-    this.targetEntity = targetEntity;
+  init({
+    target,
+    event = 'click',
+    eventOnSelf = 'click'
+  }) {
+    this.target = target;
     this.eventOnSelf = eventOnSelf;
     this.event = event;
 
-    this.remListenerRemove = this.targetEntity.addListener('removed', () => this.onTargetRemoved());
-    this.remlistener = this.targetEntity.addListener(this.event, () => this.onEvent());
+    this.#remListenerRemove = this.target.addListener('removed', () => this.onTargetRemoved());
+    this.#remlistener = this.target.addListener(this.event, () => this.onEvent());
   }
 
-  update({targetEntity = null, event = null, eventOnSelf = null}) {
+  update({
+    target = null,
+    event = null,
+    eventOnSelf = null
+  }) {
     if (eventOnSelf) this.eventOnSelf = eventOnSelf;
 
     let mustRebind = false;
-    if (targetEntity && targetEntity != this.targetEntity) {
+    if (target && target != this.target) {
       mustRebind= true;
-      this.targetEntity = targetEntity;
+      this.target = target;
     }
     if (event && event != this.event) {
       mustRebind= true;
       this.event = event;
     }
     if (mustRebind) {
-      this.remListenerRemove();
-      this.remlistener();
-      this.remListenerRemove = this.targetEntity.addListener('removed', () => this.onTargetRemoved());
-      this.remlistener = this.targetEntity.addListener(this.event, () => this.onEvent);
+      this.#remListenerRemove();
+      this.#remlistener();
+      this.#remListenerRemove = this.target.addListener('removed', () => this.onTargetRemoved());
+      this.#remlistener = this.target.addListener(this.event, () => this.onEvent);
     }
   }
 
   onTargetRemoved() {
-    this.remListenerRemove();
-    this.remlistener();
-    this.targetEntity = null;
-    this.remlistener = null;
-    this.remListenerRemove = null;
+    this.#remListenerRemove();
+    this.#remlistener();
+    this.target = null;
+    this.#remlistener = null;
+    this.#remListenerRemove = null;
   }
 
   onEvent() {
@@ -44,9 +54,9 @@ export default class ListenTo extends Component {
   }
 
   remove() {
-    if (!this.targetEntity) return;
-    this.remListenerRemove();
-    this.remlistener();
+    if (!this.target) return;
+    this.#remListenerRemove();
+    this.#remlistener();
   }
 
 }

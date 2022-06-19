@@ -4,12 +4,22 @@ import { generateUUID } from '../utils/Math.js';
 export default class Entity {
   #components
   #listeners
+  #id
+  #world
 
   constructor({id = null, world}) {
-    this.id = id ?? generateUUID();
+    this.#id = id ?? generateUUID();
     this.#components = new Map();
     this.#listeners = new Map();
-    this.world = world;
+    this.#world = world;
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get world() {
+    return this.#world;
   }
 
    /**
@@ -28,6 +38,18 @@ export default class Entity {
     }
   }
 
+  on(event, callback) {
+    return this.addListener(event, callback);
+  }
+
+  once(event, callback) {
+    const callbackOnce = data => {
+      callback(data);
+      this.removeListener(event, callbackOnce);
+    }
+    this.addListener(event, callbackOnce);
+  }
+
   addListener(event, callback) {
     let callbackSet = this.#listeners.get(event);
     // If it is the first callback for this event, we create a set storage
@@ -39,6 +61,10 @@ export default class Entity {
 
     // Return a removeListener function for conveniance
     return () => this.removeListener(event, callback);
+  }
+
+  off(event, callback) {
+    this.removeListener(event, callback);
   }
 
   removeListener(event, callback) {

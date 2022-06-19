@@ -9,6 +9,9 @@ export default class HexagonTesselation extends Component {
     tileSize = 0.5, // size of one of the hexagons
     color = 'black', // base color material
   } = {}) {
+    this.radius = radius;
+    this.tileSize = tileSize;
+    this.color = color;
 
     const vertices = [];
     for (let i = 0; i < 6; i++ ) {
@@ -54,51 +57,3 @@ export default class HexagonTesselation extends Component {
   }
 
 }
-
-
-
-/*
-import * as THREE from '../lib/three/build/three.module.js';
-
-export default function ({
-
-} = {}) {
-  // Vertices: The 6 vertices of an hexagon
-
-
-  // Shape: draw it from the vertices
-
-
-  // Geometry: extrude the shape
-
-
-  // Materials: Make a simple Material for each color variation
-
-
-  // Hexagon mesh: put it all togethers
-
-
-  // Tesselation : explanation here https://www.redblobgames.com/grids/hexagons/#coordinates-cube
-
-
-  function distanceTo(q1, r1, q2, r2) {
-    return (Math.abs(q1 - q2)
-      + Math.abs(q1 + r1 - q2 - r2)
-      + Math.abs(r1 - r2)) / 2;
-  }
-
-  function getNeighbors(q, r, chebyshevDist = 1, outerOnly = false) {
-    const test = outerOnly ? d => d == chebyshevDist : d => d <= chebyshevDist
-    const neighbors = [];
-    for (const tile of tilemap.values()) {
-      let {q: q2, r: r2} = tile.userData.coord;
-      if (test(distanceTo(q, r, q2, r2))) {
-        neighbors.push(tile);
-      }
-    }
-    return neighbors;
-    // todo return sorted by (0 -1, +1 -1, +1  0, 0 +1, -1 +1, -1  0) or for dist 2:  0 -2, +1 -2, +2 -2, +2 -1, +2  0, +1 +1, 0 +2, -1 +2, -2 +2, -2 +1, -2  0, -1 -1
-  }
-
-  return {tesselation, tilemap, getNeighbors, distanceTo, radius};
-}*/

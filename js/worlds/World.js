@@ -1,10 +1,10 @@
 import Entity from '../entities/Entity.js';
 
 export default class World {
-  #entitiesSet
+  #entitiesMap
 
   constructor() {
-    this.#entitiesSet = new Set();
+    this.#entitiesMap = new Map();
   }
 
   create(...components) {
@@ -13,12 +13,12 @@ export default class World {
 
   createEntity({id = null, components = []} = {}) {
     const entity = new Entity({id, world: this});
-    this._addComponentsToEntity(entity, components);
+    this.addComponentsToEntity(entity, components);
     this.add(entity);
     return entity;
   }
 
-  _addComponentsToEntity(entity, components) {
+  addComponentsToEntity(entity, components) {
     for (let componentParam of components) {
       // handle the special case of a no args component
       if (!Array.isArray(componentParam)) {
@@ -29,27 +29,29 @@ export default class World {
     }
   }
 
-  add(entities) {
-    if (!Array.isArray(entities)) entities = [entities];
-    for (const entity of entities) {
-      if (!(entity instanceof Entity)) throw 'The entity is not an instance of Entity';
-      this.#entitiesSet.add(entity);
+  add(entity) {
+    if (!(entity instanceof Entity)) throw 'The entity is not an instance of Entity';
+    if (this.#entitiesMap.has(entity.id)) throw 'An entity with this id already exists';
+    this.#entitiesMap.set(entity.id, entity);
+  }
+
+  remove(idOrEntity) {
+    const entity = idOrEntity instanceof Entity ? idOrEntity : this.#entitiesMap.get(idOrEntity);
+    if (this.#entitiesMap.delete(entity.id)) {
+      // emit a "removed" event on the entity (usefull for others entities that are listening to this one)
+      entity.emit('removed', {world: this});
+      entity.remove();
     }
   }
 
-  remove(entities) {
-    if (!Array.isArray(entities)) entities = [entities];
-    for (const entity of entities) {
-      if (this.#entitiesSet.delete(entity)) {
-        // emit a "removed" event on the entity (usefull for others entities that are listening to this one)
-        entity.emit('removed', {world: this});
-        entity.remove();
-      }
-    }
+  has(idOrEntity) {
+    return this.#entitiesMap.has(
+      idOrEntity instanceof Entity ? idOrEntity.id : idOrEntity
+    );
   }
 
-  has(entity) {
-    return this.#entitiesSet.has(entity);
+  get(id) {
+    return this.#entitiesMap.get(id);
   }
 
 }
