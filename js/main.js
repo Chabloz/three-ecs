@@ -55,15 +55,13 @@ const e1 = world.create(
     ease: 'bounceOut',
   }],
 );
+e1.addListener('click', () => console.log('e0 was clicked so me tooo'));
 
 e0.addComponent(ListenTo, {
   target: e1,
   event: 'finish',
   eventOnSelf: 'rotate',
 });
-
-e1.addListener('click', () => console.log('e0 was clicked so me tooo'));
-console.log(e1.getComponent(ListenTo).get('target'));
 
 const camera = world.create(
   [Camera, {active: false}],
@@ -77,7 +75,7 @@ setTimeout(() => {
 
 setTimeout(() => {
   e0.emit('click');
-  console.log(e0.getComponent(Animation).get('tween'));
+  console.log(e0.getComponent(Animation).get('duration'));
 }, 2000);
 
 // setTimeout(() => {

@@ -14,7 +14,7 @@ export default class ListenTo extends Component {
     this.event = event;
 
     this.#remListenerRemove = this.target.addListener('removed', () => this.onTargetRemoved());
-    this.#remlistener = this.target.addListener(this.event, () => this.onEvent());
+    this.#remlistener = this.target.addListener(this.event, evt => this.onEvent(evt));
   }
 
   update({
@@ -49,8 +49,14 @@ export default class ListenTo extends Component {
     this.#remListenerRemove = null;
   }
 
-  onEvent() {
-    this.entity.emit(this.eventOnSelf);
+  onEvent(evt) {
+    // propagate the original event to the entity
+    // and add a reference of the original entity to the event data
+    this.entity.emit(this.eventOnSelf, {
+      ...evt,
+      entity: this.entity,
+      originEntity: this.target
+    });
   }
 
   remove() {
