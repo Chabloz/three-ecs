@@ -28,7 +28,6 @@ export default class Animation extends Component {
 
     if (startEvent) {
       this.entity.once(startEvent, evt => {
-        console.log(evt);
         this.createTween(evt?.timeOverrun);
       });
     } else {
