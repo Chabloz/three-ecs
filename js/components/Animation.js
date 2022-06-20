@@ -25,9 +25,10 @@ export default class Animation extends Component {
     this.yoyo = yoyo;
     this.startEvent = startEvent;
     this.endEvent = endEvent;
+    this.removeOnce = () => {};
 
     if (startEvent) {
-      this.entity.once(startEvent, evt => {
+      this.removeOnce = this.entity.once(startEvent, evt => {
         this.createTween(evt?.timeOverrun);
       });
     } else {
@@ -60,6 +61,7 @@ export default class Animation extends Component {
 
   remove() {
     tweens.delete(this.tween);
+    this.removeOnce();
   }
 
 }

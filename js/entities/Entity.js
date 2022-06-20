@@ -44,10 +44,11 @@ export default class Entity {
 
   once(event, callback) {
     const callbackOnce = data => {
-      callback(data);
       this.removeListener(event, callbackOnce);
+      callback(data);
     }
     this.addListener(event, callbackOnce);
+    return () => this.removeListener(event, callbackOnce);
   }
 
   addListener(event, callback) {

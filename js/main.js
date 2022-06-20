@@ -8,6 +8,8 @@ import Camera from './components/Camera.js';
 import LookAt from './components/LookAt.js';
 import ListenTo from './components/ListenTo.js';
 import Animation from './components/Animation.js';
+import Visibility from './components/Visibility.js';
+import EventSet from './components/EventSet.js';
 
 const world = new World();
 
@@ -17,6 +19,13 @@ const e0 = world.createEntity({
     Box,
     [Rotation, {x:2 , z: 2}],
     [Position, {x:-2 , z: -4}],
+    [Visibility, {visible: false}],
+    [EventSet, {
+      component: Visibility,
+      property: 'visible',
+      value: true,
+      event: 'rotate',
+    }],
     [Animation, {
       component: Rotation,
       property: 'y',
@@ -75,7 +84,6 @@ setTimeout(() => {
 
 setTimeout(() => {
   e0.emit('click');
-  console.log(e0.getComponent(Animation).get('duration'));
 }, 2000);
 
 // setTimeout(() => {
