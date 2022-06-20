@@ -16,13 +16,22 @@ const e0 = world.createEntity({
   components: [
     Box,
     [Rotation, {x:2 , z: 2}],
-    [Position, {x:-2 , z: -4}]
+    [Position, {x:-2 , z: -4}],
+    [Animation, {
+      component: Rotation,
+      property: 'y',
+      to: Math.PI,
+      startEvent: 'rotate',
+      duration: 1500,
+      yoyo: true,
+      loop: true,
+      ease: 'bounceOut',
+    }],
   ]
 });
 
 const e1 = world.create(
   [HexagonTesselation, {radius: 10}], // maybe make this object ?
-  Box,
   [Rotation, {x:2 , z: 2}],
   [Position, {x:0 , y: 2, z: -4}],
   [ListenTo, {target: world.get('the-box')}],
@@ -30,7 +39,8 @@ const e1 = world.create(
     component: Position,
     property: 'y',
     to: 0,
-    duration: 2000,
+    startEvent: 'click',
+    duration: 1000,
     endEvent: 'rotate',
     ease: 'bounceOut',
   }],
@@ -39,12 +49,19 @@ const e1 = world.create(
     property: 'y',
     to: Math.PI,
     startEvent: 'rotate',
-    duration: 2000,
+    endEvent: 'finish',
+    duration: 1500,
     yoyo: true,
-    loop: true,
     ease: 'bounceOut',
   }],
 );
+
+e0.addComponent(ListenTo, {
+  target: e1,
+  event: 'finish',
+  eventOnSelf: 'rotate',
+});
+
 e1.addListener('click', () => console.log('e0 was clicked so me tooo'));
 console.log(e1.getComponent(ListenTo).get('target'));
 
@@ -55,12 +72,12 @@ const camera = world.create(
 
 setTimeout(() => {
   e0.emit('click');
-  e0.addComponent(LookAt, {target: camera});
+  // e0.addComponent(LookAt, {target: camera});
 }, 1000);
 
 setTimeout(() => {
   e0.emit('click');
-  e1.removeComponent(Box);
+  console.log(e0.getComponent(Animation).get('tween'));
 }, 2000);
 
 // setTimeout(() => {

@@ -57,9 +57,10 @@ export default class Tweens{
     ease = 'linear',
     animate,
     atEnd = () => {},
+    startAtTime = 0
   } = {}) {
     ease = easingFct.get(ease);
-    const tween = {time: 0, duration, ease, from, to, loop, yoyo, animate, atEnd};
+    const tween = {time: startAtTime, duration, ease, from, to, loop, yoyo, animate, atEnd};
     if (after) {
       this.tweensAfter.set(after, tween)
     } else {
@@ -93,20 +94,23 @@ export default class Tweens{
       tween.animate(progress);
       if (timeFraction != 1) continue;
 
+      // calculate the time overrun (useful to build the next tween)
+      const timeOverrun = tween.time - tween.duration;
+
       // Manage the end of life of the tween
       if (tween.loop || tween.yoyo) {
         if (tween.yoyo) [tween.to, tween.from] = [tween.from, tween.to];
         if (tween.yoyo && !tween.loop) tween.yoyo = false;
-        tween.time = tween.time - tween.duration;
+        tween.time = timeOverrun;
       } else {
         if (this.tweensAfter.has(tween)) {
           const newTween = this.tweensAfter.get(tween);
-          newTween.time = tween.time - tween.duration;
+          newTween.time = timeOverrun;
           newTweens.push();
           this.tweensAfter.delete(tween);
         }
         this.tweens.delete(tween);
-        tween.atEnd(tween.time - tween.duration);
+        tween.atEnd(timeOverrun);
       }
     }
 

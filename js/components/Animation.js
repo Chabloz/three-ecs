@@ -15,38 +15,47 @@ export default class Animation extends Component {
     startEvent = null,
     endEvent = null,
   }) {
-    const createTween = () => {
-      this.targetComponent = this.entity.getComponent(component);
-      this.targetProperty = property;
-      this.endEvent = endEvent;
-      this.tween = tweens.create({
-        duration,
-        from: from === null ? this.targetComponent.get(this.targetProperty) : from,
-        to,
-        loop,
-        yoyo,
-        ease,
-        animate : progress => this.animate(progress),
-        atEnd : t => this.atEnd()
-      });
-    }
+    this.component = component;
+    this.property = property;
+    this.from = from;
+    this.to = to;
+    this.duration = duration;
+    this.ease = ease;
+    this.loop = loop;
+    this.yoyo = yoyo;
+    this.startEvent = startEvent;
+    this.endEvent = endEvent;
+
     if (startEvent) {
-      this.entity.once(startEvent, () => createTween());
+      this.entity.once(startEvent, evt => {
+        this.createTween(evt?.timeOverrun);
+      });
     } else {
-      createTween();
+      this.createTween();
     }
   }
 
-  atEnd() {
-    this.entity.emit(this.endEvent);
+  createTween(startAtTime = 0) {
+    this.targetComponent = this.entity.getComponent(this.component);
+    this.tween = tweens.create({
+      duration: this.duration,
+      from: this.from === null ? this.targetComponent.get(this.property) : this.from,
+      to: this.to,
+      loop: this.loop,
+      yoyo: this.yoyo,
+      ease: this.ease,
+      startAtTime,
+      animate : progress => this.animate(progress),
+      atEnd : timeOverrun => this.atEnd(timeOverrun)
+    });
+  }
+
+  atEnd(timeOverrun) {
+    this.entity.emit(this.endEvent, {timeOverrun});
   }
 
   animate(progress) {
-    this.targetComponent.update({[this.targetProperty]: progress});
-  }
-
-  create() {
-
+    this.targetComponent.update({[this.property]: progress});
   }
 
   remove() {
@@ -54,7 +63,3 @@ export default class Animation extends Component {
   }
 
 }
-
-/*
-
-*/
