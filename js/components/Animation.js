@@ -17,6 +17,7 @@ export default class Animation extends Component {
     yoyo = false,
     startEvent = 'added',
     endEvent = null,
+    multipleStart = false,
   }) {
     this.component = component;
     this.property = property;
@@ -28,6 +29,7 @@ export default class Animation extends Component {
     this.yoyo = yoyo;
     this.startEvent = startEvent;
     this.endEvent = endEvent;
+    this.multipleStart = multipleStart;
 
     this.#removeOnce = this.entity.once(startEvent, evt => {
       this.createTween(evt?.timeOverrun);
@@ -37,6 +39,7 @@ export default class Animation extends Component {
   createTween(startAtTime = 0) {
     // TODO handle the case of the target component being removed ? (we need to stop the tween)
     this.#targetComponent = this.entity.getComponent(this.component);
+    tweens.delete(this.#tween);
     this.#tween = tweens.create({
       duration: this.duration,
       from: this.from === null ? this.#targetComponent.get(this.property) : this.from,
@@ -51,8 +54,14 @@ export default class Animation extends Component {
   }
 
   atEnd(timeOverrun) {
-    if (!this.endEvent) return;
-    this.entity.emit(this.endEvent, {timeOverrun});
+    if (this.endEvent) {
+      this.entity.emit(this.endEvent, {timeOverrun});
+    }
+    if (this.multipleStart) {
+      this.#removeOnce = this.entity.once(this.startEvent, evt => {
+        this.createTween(evt?.timeOverrun);
+      });
+    }
   }
 
   animate(progress) {

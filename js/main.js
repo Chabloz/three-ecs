@@ -16,28 +16,20 @@ const world = new World();
 
 const camera = world.create(Camera);
 
-const parentOfAll = world.create(
-  [Position, {z: -4}],
-  Clickable
+const parent = world.create(
+  [Position, {z: -8}],
+  Rotation,
+  Clickable,
+  [Animation, {
+    component: Rotation,
+    property: 'y',
+    to: Math.PI,
+    duration: 1500,
+    ease: 'bounceOut',
+    startEvent: 'click',
+    endEvent: 'rotate',
+  }],
 );
-
-const parent = world.createEntity({
-  parent: parentOfAll,
-  components: [
-    [Position, {z: -4}],
-    Rotation,
-    Clickable,
-    [Animation, {
-      component: Rotation,
-      property: 'y',
-      to: Math.PI,
-      duration: 1500,
-      yoyo: true,
-      loop: true,
-      ease: 'bounceOut',
-    }],
-  ]
-});
 
 const b1 = world.createEntity({
   parent: parent,
@@ -45,7 +37,17 @@ const b1 = world.createEntity({
     Box,
     Clickable,
     [Rotation, {x: 2, y: 2}],
-    [Position, {x: -1, z: -4}],
+    [Position, {x: -1, y: 0, z: -4}],
+    [Animation, {
+      component: Position,
+      property: 'y',
+      to: 2,
+      duration: 1500,
+      yoyo: true,
+      startEvent: 'click',
+      ease: 'bounceOut',
+      multipleStart: true,
+    }],
   ]
 });
 
@@ -55,17 +57,12 @@ const b2 = world.createEntity({
     Box,
     [Rotation, {x: -2, y: 2}],
     [Position, {x: 1, z: -4}],
-    [LookAt, {target: camera}]
   ]
 });
 
 parent.on('click', (evt) => console.log('p clicked', evt));
 b1.on('click', (evt) => console.log('b1 clicked',evt));
 world.start();
-
-setTimeout(() => {
-  world.remove(b1);
-}, 2000);
 
 // const e0 = world.createEntity({
 //   id: 'the-box',
