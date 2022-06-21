@@ -2,6 +2,7 @@ import Component from './Component.js';
 import tweens from "../systems/Tween.js";
 
 export default class EventSet extends Component {
+  #removeOnce
 
   init({
     component,
@@ -13,14 +14,14 @@ export default class EventSet extends Component {
     this.property = property;
     this.value = value;
     this.event = event;
-    this.removeOnce = this.entity.once(event, evt => {
-      this.targetComponent = this.entity.getComponent(this.component);
-      this.targetComponent.update({[this.property]: this.value});
+    this.#removeOnce = this.entity.once(event, evt => {
+      const targetComponent = this.entity.getComponent(this.component);
+      targetComponent.update({[this.property]: this.value});
     });
   }
 
   remove() {
-    this.removeOnce();
+    this.#removeOnce();
   }
 
 }

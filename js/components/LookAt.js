@@ -1,5 +1,5 @@
 import Component from "./Component.js";
-import * as THREE from '../lib/three/build/three.module.js';
+import {Vector3} from '../lib/three/build/three.module.js';
 import mainloop from "../systems/MainLoop.js";
 
 export default class LookAt extends Component {
@@ -8,7 +8,7 @@ export default class LookAt extends Component {
 
   init({target}) {
     this.target = target.object3D;
-    this.#targetWorldPosition = new THREE.Vector3();
+    this.#targetWorldPosition = new Vector3();
     this.#unregister = mainloop.register((dt, t) => this.tick(dt, t));
   }
 
@@ -18,7 +18,6 @@ export default class LookAt extends Component {
 
   remove() {
     this.#unregister();
-    this.#unregister = null;
   }
 
   tick(dt, t) {

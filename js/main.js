@@ -10,13 +10,16 @@ import ListenTo from './components/ListenTo.js';
 import Animation from './components/Animation.js';
 import Visibility from './components/Visibility.js';
 import EventSet from './components/EventSet.js';
+import Clickable from './components/Clickable.js';
 
 const world = new World();
+
 
 const e0 = world.createEntity({
   id: 'the-box',
   components: [
     Box,
+    Clickable,
     [Rotation, {x:2 , z: 2}],
     [Position, {x:-2 , z: -4}],
     [Visibility, {visible: false}],
@@ -38,9 +41,11 @@ const e0 = world.createEntity({
     }],
   ]
 });
+e0.on('click', (event) => console.log('e0 was clicked', event));
 
 const e1 = world.create(
-  [HexagonTesselation, {radius: 10}], // maybe make this object ?
+  [HexagonTesselation, {radius: 10}],
+  Clickable,
   [Rotation, {x:2 , z: 2}],
   [Position, {x:0 , y: 2, z: -4}],
   [ListenTo, {target: world.get('the-box')}],
@@ -64,7 +69,7 @@ const e1 = world.create(
     ease: 'bounceOut',
   }],
 );
-e1.addListener('click', () => console.log('e0 was clicked so me tooo'));
+e1.on('click', (event) => console.log('e1 was clicked', event));
 
 e0.addComponent(ListenTo, {
   target: e1,
@@ -82,9 +87,9 @@ setTimeout(() => {
   // e0.addComponent(LookAt, {target: camera});
 }, 1000);
 
-setTimeout(() => {
-  e0.emit('click');
-}, 2000);
+// setTimeout(() => {
+//   e0.emit('click');
+// }, 2000);
 
 // setTimeout(() => {
 //   camera.updateComponent(Camera, {active: true});

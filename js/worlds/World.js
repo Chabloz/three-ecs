@@ -33,12 +33,12 @@ export default class World {
     if (!(entity instanceof Entity)) throw 'The entity is not an instance of Entity';
     if (this.#entitiesMap.has(entity.id)) throw 'An entity with this id already exists';
     this.#entitiesMap.set(entity.id, entity);
+    entity.emit('added', {world: this});
   }
 
   remove(idOrEntity) {
     const entity = idOrEntity instanceof Entity ? idOrEntity : this.#entitiesMap.get(idOrEntity);
     if (this.#entitiesMap.delete(entity.id)) {
-      // emit a "removed" event on the entity (usefull for others entities that are listening to this one)
       entity.emit('removed', {world: this});
       entity.remove();
     }
@@ -52,6 +52,10 @@ export default class World {
 
   get(id) {
     return this.#entitiesMap.get(id);
+  }
+
+  get entities() {
+    return this.#entitiesMap.values();
   }
 
 }

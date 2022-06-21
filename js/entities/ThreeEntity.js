@@ -42,6 +42,11 @@ export default class ThreeEntity extends Entity {
     return this.#group;
   }
 
+  get objects3D() {
+    return [...this.#groupMap.values()];
+    //return this.#group.children;
+  }
+
   set object3D(object3D) {
     this.setObject3D(object3D);
   }
