@@ -13,7 +13,7 @@ export default class LookAt extends Component {
   }
 
   update({target}) {
-    this.target = target;
+    this.target = target.object3D;
   }
 
   remove() {

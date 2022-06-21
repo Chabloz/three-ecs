@@ -30,8 +30,8 @@ export default class World {
   }
 
   add(entity) {
-    if (!(entity instanceof Entity)) throw 'The entity is not an instance of Entity';
-    if (this.#entitiesMap.has(entity.id)) throw 'An entity with this id already exists';
+    if (!(entity instanceof Entity)) throw new Error('The entity is not an instance of Entity');
+    if (this.#entitiesMap.has(entity.id)) throw new Error('An entity with this id already exists');
     this.#entitiesMap.set(entity.id, entity);
     entity.emit('added', {world: this});
   }
@@ -56,6 +56,10 @@ export default class World {
 
   get entities() {
     return this.#entitiesMap.values();
+  }
+
+  get entitiesMap() {
+    return this.#entitiesMap;
   }
 
 }

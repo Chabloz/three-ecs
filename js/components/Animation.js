@@ -35,6 +35,7 @@ export default class Animation extends Component {
   }
 
   createTween(startAtTime = 0) {
+    // TODO handle the case of the target component being removed ? (we need to stop the tween)
     this.#targetComponent = this.entity.getComponent(this.component);
     this.#tween = tweens.create({
       duration: this.duration,

@@ -12,13 +12,23 @@ document.addEventListener('click', evt => {
   const worldCamera = entity.world.getCamera();
   raycaster.setFromCamera(mouse.position, worldCamera);
 
+  let minDistance = Infinity;
+  let minDistanceEntities = new Map();
   while (entity) {
     const intersects = raycaster.intersectObjects(entity.objects3D, true);
     if (intersects.length > 0) {
-      entity.emit('click', {intersection: intersects[0]});
-      return;
+      const distance = intersects[0].distance;
+      if (distance < minDistance) minDistanceEntities.clear();
+      if (distance <= minDistance) {
+        minDistanceEntities.set(entity, intersects[0]);
+        minDistance = distance;
+      }
     }
     entity = entityIterator.next().value;
+  }
+
+  for (const [entity, intersection] of minDistanceEntities) {
+    entity.emit('click', {intersection});
   }
 });
 

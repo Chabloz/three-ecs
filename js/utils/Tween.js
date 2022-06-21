@@ -44,14 +44,12 @@ export default class Tweens{
 
   constructor() {
     this.tweens = new Set();
-    this.tweensAfter = new Map();
   }
 
   create({
     duration = 1000,
     from = 0,
     to = 1,
-    after = null,
     loop = false,
     yoyo = false,
     ease = 'linear',
@@ -61,11 +59,7 @@ export default class Tweens{
   } = {}) {
     ease = easingFct.get(ease);
     const tween = {time: startAtTime, duration, ease, from, to, loop, yoyo, animate, atEnd};
-    if (after) {
-      this.tweensAfter.set(after, tween)
-    } else {
-      this.tweens.add(tween);
-    }
+    this.tweens.add(tween);
     return tween;
   }
 
@@ -79,12 +73,9 @@ export default class Tweens{
 
   deleteAll() {
     this.tweens = new Set();
-    this.tweensAfter = new Map();
   }
 
   update(dt) {
-    const newTweens = [];
-
     for (const tween of this.tweens) {
       tween.time += dt;
       let timeFraction = tween.time / tween.duration;
@@ -103,18 +94,10 @@ export default class Tweens{
         if (tween.yoyo && !tween.loop) tween.yoyo = false;
         tween.time = timeOverrun;
       } else {
-        if (this.tweensAfter.has(tween)) {
-          const newTween = this.tweensAfter.get(tween);
-          newTween.time = timeOverrun;
-          newTweens.push();
-          this.tweensAfter.delete(tween);
-        }
         this.tweens.delete(tween);
         tween.atEnd(timeOverrun);
       }
     }
-
-    newTweens.forEach(tween => this.tweens.add(tween));
   }
 
 }

@@ -85,7 +85,7 @@ export default class Entity {
   addComponent(TheComponent, args = {}, id) {
     const component = new TheComponent(this, id);
     if (!(component instanceof Component)) {
-      throw 'The component is not an instance of Component';
+      throw new Error('The component is not an instance of Component');
     }
 
     let componentSet = this.#components.get(component.className);
@@ -146,7 +146,7 @@ export default class Entity {
     // remove them from the set
     this.#components.delete(className);
 
-    // and call the remove method of all the removed components
+    // and call the remove method of all the removed coponents
     // (to do internall component cleanup if needed)
     for (const component of componentSet) {
       component.remove();
@@ -158,7 +158,7 @@ export default class Entity {
   removeComponentById(id) {
     for (const component of this.components()) {
       if (component.id == id) {
-        return this.removeComponent(component);;
+        return this.removeComponentByInstance(component);
       }
     }
     return false;
@@ -236,12 +236,12 @@ export default class Entity {
     if (component?.name) {
       return this.updateComponentByClass(component, args);
     }
-    throw 'Invalid component parameter';
+    throw new Error('Invalid component parameter');
   }
 
   updateComponentById(id, args) {
     const component = this.getComponentById(id);
-    if (!component) throw `No component with this id was found`;
+    if (!component) throw new Error('No component with this id was found');
     component.update(args);
   }
 
@@ -255,7 +255,7 @@ export default class Entity {
     if (components instanceof Component) {
       components = [components];
     }
-    if (!components) throw `No component with this id was found`;
+    if (!components) throw new Error('No component with this id was found');
     // Update all compoenent of the same class
     for (const component of components) {
       component.update(args);

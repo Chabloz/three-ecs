@@ -64,10 +64,22 @@ export default class ThreeWorld extends World {
   }
 
   createEntity({id = null, components = [], parent = null} = {}) {
-    const entity = new ThreeEntity({id, parent: parent ?? this.scene, world: this});
+    const theParent = parent instanceof ThreeEntity ? parent.object3D : this.scene;
+    const entity = new ThreeEntity({id, parent: theParent, world: this});
     this.addComponentsToEntity(entity, components);
     this.add(entity);
+
+    if (parent instanceof ThreeEntity) {
+      parent.addChild(entity)
+    }
+
     return entity;
+  }
+
+  remove(idOrEntity) {
+    const entity = idOrEntity instanceof ThreeEntity ? idOrEntity : this.get(idOrEntity);
+    for (const child of entity.children) this.remove(child);
+    super.remove(entity);
   }
 
 }
