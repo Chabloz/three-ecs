@@ -27,7 +27,7 @@ export default class Component {
   }
 
   update(args) {
-    // To implement in a component
+    // To implement in a component (but code a default version here ?)
   }
 
   remove() {

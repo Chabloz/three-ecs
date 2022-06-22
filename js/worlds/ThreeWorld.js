@@ -10,7 +10,7 @@ export default class ThreeWorld extends World {
 
   constructor({
     autoResize = true,
-    backgroundColor = 'white',
+    backgroundColor = 'black',
     renderOpt = {
       logarithmicDepthBuffer: false,
       antialias: true,

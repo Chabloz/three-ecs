@@ -9,15 +9,29 @@ export default class EventSet extends Component {
     property,
     value,
     event = 'click',
+    multipleSet = false,
   }) {
     this.component = component;
     this.property = property;
     this.value = value;
     this.event = event;
-    this.#removeOnce = this.entity.once(event, evt => {
-      const targetComponent = this.entity.getComponent(this.component);
-      targetComponent.update({[this.property]: this.value});
+    this.multipleSet = multipleSet;
+
+    this.#removeOnce = this.entity.once(this.event, evt => {
+      this.onEvent();
     });
+  }
+
+  onEvent() {
+    const targetComponent = this.entity.getComponent(this.component);
+    // if value is a function, call it to get the value
+    const newValue = typeof this.value === 'function' ? this.value() : this.value;
+    targetComponent.update({[this.property]: newValue});
+    if (this.multipleSet) {
+      this.#removeOnce = this.entity.once(this.event, evt => {
+        this.onEvent();
+      });
+    }
   }
 
   remove() {

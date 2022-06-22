@@ -77,7 +77,10 @@ export default class Entity {
   emit(event, data = {}) {
     const callbackSet = this.#listeners.get(event);
     if (!callbackSet) return;
-    for (const callback of callbackSet) {
+    // we need to copy the set to avoid concurrency issues
+    // because callback might add or remove listeners
+    const toCalls = [...callbackSet];
+    for (const callback of toCalls) {
       callback({entity: this, ...data});
     }
   }

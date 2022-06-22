@@ -38,6 +38,11 @@ export default class ThreeEntity extends Entity {
     return this.#groupMap.get(name);
   }
 
+  getFirstObject3D() {
+    if (this.#groupMap.size === 0) throw new Error('You need to add at least one object3D to the entity');
+    return this.#groupMap.values().next().value;
+  }
+
   get object3D() {
     return this.#group;
   }

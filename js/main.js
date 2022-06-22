@@ -3,7 +3,9 @@ import Position from './components/Position.js';
 import Rotation from './components/Rotation.js';
 import HexagonTesselation from './components/HexagonTesselation.js';
 import LightAmbient from './components/LightAmbient.js';
+import LightDirectional from './components/LightDirectional.js';
 import Box from './components/Box.js';
+import Plane from './components/Plane.js';
 import Camera from './components/Camera.js';
 import LookAt from './components/LookAt.js';
 import ListenTo from './components/ListenTo.js';
@@ -11,8 +13,9 @@ import Animation from './components/Animation.js';
 import Visibility from './components/Visibility.js';
 import EventSet from './components/EventSet.js';
 import Clickable from './components/Clickable.js';
+import MaterialLifeLikeAutomaton from './components/MaterialLifeLikeAutomaton.js';
 
-const world = new World();
+const world = new World({backgroundColor: 'black'});
 
 const camera = world.create(Camera);
 
@@ -54,14 +57,51 @@ const b1 = world.createEntity({
 const b2 = world.createEntity({
   parent: parent,
   components: [
-    Box,
+    [Box, {}, 'the-box'],
+    [Plane, {}, 'the-plane'],
+    Clickable,
     [Rotation, {x: -2, y: 2}],
     [Position, {x: 1, z: -4}],
   ]
 });
 
+const lights = world.create(
+  [LightAmbient, {intensity: 2}],
+  [LightDirectional, {intensity: 0.5}],
+  [Position, {x: 0, y: 5, z: 0}],
+  [Animation, {
+    component: LightDirectional,
+    property: 'intensity',
+    to: 5,
+    duration: 3000,
+    yoyo: true,
+    loop: true,
+  }],
+  [Animation, {
+    component: LightAmbient,
+    property: 'intensity',
+    to: 1,
+    duration: 3000,
+    yoyo: true,
+    loop: true,
+  }],
+  [ListenTo, {target: b2}],
+  [EventSet, {
+    component: Position,
+    property: 'y',
+    value: () => {
+      const pos = lights.getComponent(Position);
+      pos.update({y: -pos.get('y')});
+    },
+    multipleSet: true,
+  }],
+);
+
+parent.addComponent(MaterialLifeLikeAutomaton);
+
 parent.on('click', (evt) => console.log('p clicked', evt));
 b1.on('click', (evt) => console.log('b1 clicked',evt));
+b2.on('click', (evt) => console.log('b2 clicked',evt));
 world.start();
 
 // const e0 = world.createEntity({
