@@ -14,8 +14,8 @@ export default class MaterialLifeLikeAutomaton extends Component {
     resolution = 256,
     birthRule = [3],
     survivalRule = [2, 3],
-    probAlive = 0.5,
-    applyOnlyToId = null,
+    probAlive = 0.6,
+    applyOnlyToId = null
   } = {}) {
     this.resolution = resolution;
     this.birthRule = birthRule;
@@ -74,19 +74,11 @@ export default class MaterialLifeLikeAutomaton extends Component {
       `,
     });
 
-    // this.#material.side = BackSide;
-    this.#material.side = DoubleSide;
+    this.#material.side = DoubleSide; // todo: make this a property
 
     this.#unregister = mainloop.register((dt, t) => this.tick(dt, t));
 
-    // apply only to id or apply to all object3d of the entity
-    if (applyOnlyToId) {
-      this.entity.getObject3D(applyOnlyToId).material = this.#material;
-    } else {
-      this.entity.object3D.traverse(child => {
-        if (child.material) child.material = this.#material;
-      })
-    }
+    this.entity.setMaterial(this.#material, applyOnlyToId);
   }
 
   tick(dt, t) {

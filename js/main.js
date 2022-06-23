@@ -17,10 +17,10 @@ import MaterialLifeLikeAutomaton from './components/MaterialLifeLikeAutomaton.js
 
 const world = new World({backgroundColor: 'black'});
 
-const camera = world.create(Camera);
+const camera = world.create(Camera, [Position, {z: 4, y: 1}]);
 
 const parent = world.create(
-  [Position, {z: -8}],
+  [Position, {z: -4}],
   Rotation,
   Clickable,
   [Animation, {
@@ -58,10 +58,20 @@ const b2 = world.createEntity({
   parent: parent,
   components: [
     [Box, {}, 'the-box'],
-    [Plane, {}, 'the-plane'],
+    [Plane, {height: 2, width: 2}, 'the-plane'],
     Clickable,
     [Rotation, {x: -2, y: 2}],
     [Position, {x: 1, z: -4}],
+    [Animation, {
+      component: Position,
+      property: 'y',
+      to: 2,
+      duration: 1500,
+      yoyo: true,
+      startEvent: 'click',
+      ease: 'bounceOut',
+      multipleStart: true,
+    }],
   ]
 });
 
