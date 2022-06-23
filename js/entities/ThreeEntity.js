@@ -48,10 +48,15 @@ export default class ThreeEntity extends Entity {
 
   setMaterial(material, applyOnlyToId = null) {
     if (applyOnlyToId) {
-      this.#groupMap.get(applyOnlyToId).material = material;
+      const child = this.#groupMap.get(applyOnlyToId);
+      child.material.dispose();
+      child.material = material;
     } else {
       this.#group.traverse(child => {
-        if (child.material) child.material = material;
+        if (child.material) {
+          child.material.dispose();
+          child.material = material;
+        }
       })
     }
   }

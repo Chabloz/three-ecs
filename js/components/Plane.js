@@ -1,5 +1,5 @@
 import Component from './Component.js';
-import { PlaneGeometry, Mesh, MeshStandardMaterial, DoubleSide }  from '../lib/three/build/three.module.js';
+import { PlaneGeometry, Mesh, MeshStandardMaterial, DoubleSide, Color }  from '../lib/three/build/three.module.js';
 
 export default class Plane extends Component {
   #geometry
@@ -19,7 +19,7 @@ export default class Plane extends Component {
     this.heightSegments = heightSegments;
 
     this.#geometry = new PlaneGeometry(this.width, this.height, this.widthSegments, this.heightSegments);
-    const material = new MeshStandardMaterial({ color: 0x00ff00, side: DoubleSide });
+    const material = new MeshStandardMaterial({ color: new Color(this.color), side: DoubleSide });
     this.#plane = new Mesh(this.#geometry, material);
     this.entity.setObject3D(this.#plane, this.id);
   }
