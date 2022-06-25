@@ -1,5 +1,5 @@
 import Entity from "./Entity.js";
-import * as THREE from '../lib/three/build/three.module.js';
+import { Group } from '../lib/three/build/three.module.js';
 
 export default class ThreeEntity extends Entity {
   #childrenMap
@@ -9,7 +9,7 @@ export default class ThreeEntity extends Entity {
 
   constructor({id = null, parent, world}) {
     super({id, world});
-    this.#group = new THREE.Group();
+    this.#group = new Group();
     this.#groupMap = new Map();
     this.#childrenMap = new Map();
     this.parent = parent;
