@@ -8,10 +8,15 @@ import LookAt from './components/LookAt.js';
 import Animation from './components/Animation.js';
 import Clickable from './components/Clickable.js';
 import MaterialLifeLikeAutomaton from './components/MaterialLifeLikeAutomaton.js';
+import OrbitControls from './components/OrbitControls.js';
 
 const world = new World({backgroundColor: 'black'});
 
-const camera = world.create(Camera, [Position, {z: 4, y: 1}]);
+const camera = world.create(
+  Camera,
+  [Position, {z: 4, y: 1}],
+  OrbitControls
+);
 
 const parent = world.create(
   [Position, {z: -4}],
