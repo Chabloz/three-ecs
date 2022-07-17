@@ -110,7 +110,7 @@ const clusters = {
   nbLifes: 6,
 };
 
-const options = maze;
+const options = lavaShard;
 
 const hexagons = world.create(
   [HexagonTesselationAutomaton, {
