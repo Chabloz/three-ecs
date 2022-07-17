@@ -35,9 +35,10 @@ export default class HexagonTesselationAutomaton extends Component {
     this.birthRule = new Set(birthRule);
     this.survivalRule = new Set(survivalRule);
     this.nbLifes = nbLifes;
+    this.size = this.radius - 1;
 
     this.#genColor();
-    this.#genTessalation();
+    this.#genTesselation();
     this.#genBorderMesh();
     this.#genHexagonMesh();
     this.#genMeshTessalation();
@@ -55,25 +56,22 @@ export default class HexagonTesselationAutomaton extends Component {
 
   updateTesselation(tesselation) {
     let indInstance = 0;
-    const size = this.radius - 1;
-    for (let q = -size; q <= size; q++) {
-      for (let r = Math.max(-size, -q - size); r <= Math.min(size, -q + size); r++) {
-        const aliveState = tesselation.get(`${q},${r}`).alive;
+    for (let q = -this.size; q <= this.size; q++) {
+      for (let r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r++) {
+        const aliveState = this.tesselation.get(q).get(r).alive;
         this.hexagonMesh.setColorAt(indInstance++, aliveState ? this.alivesColorArray[aliveState - 1] :  this.deadColor);
       }
     }
     this.hexagonMesh.instanceColor.needsUpdate = true;
   }
 
-
   applyRule() {
     const toSwitchRegen = [];
     const toSwitchDead = [];
 
-    const size = this.radius - 1;
-    for (let q = -size; q <= size; q++) {
-      for (let r = Math.max(-size, -q - size); r <= Math.min(size, -q + size); r++) {
-        const hexagon = this.tesselation.get(`${q},${r}`);
+    for (let q = -this.size; q <= this.size; q++) {
+      for (let r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r++) {
+        const hexagon = this.tesselation.get(q).get(r);
         const nbAliveNeighbors = this.#getNbAliveNeighbors(q, r);
         if (hexagon.alive == 0 && this.birthRule.has(nbAliveNeighbors)) {
           toSwitchRegen.push(hexagon);
@@ -100,18 +98,16 @@ export default class HexagonTesselationAutomaton extends Component {
 
   #genMeshTessalation() {
     const dummy = new Object3D();
-    const size = this.radius - 1;
     let indInstance = 0;
-    for (let q = -size; q <= size; q++) {
-      for (let r = Math.max(-size, -q - size); r <= Math.min(size, -q + size); r++) {
+    for (let q = -this.size; q <= this.size; q++) {
+      for (let r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r++) {
         const x = this.tileSize * (1.5 * q);
         const y = this.tileSize * (Math.sqrt(3) / 2 * q  +  Math.sqrt(3) * r);
-        const aliveState = this.tesselation.get(`${q},${r}`).alive;
+        const aliveState = this.tesselation.get(q).get(r).alive;
         dummy.position.set(x, y, 0);
         dummy.updateMatrix();
         this.borderMesh.setMatrixAt(indInstance, dummy.matrix);
         this.hexagonMesh.setMatrixAt(indInstance, dummy.matrix);
-        // todo
         this.hexagonMesh.setColorAt(indInstance++, aliveState ? this.alivesColorArray[aliveState - 1] :  this.deadColor);
       }
     }
@@ -130,22 +126,24 @@ export default class HexagonTesselationAutomaton extends Component {
   #genBorderMesh() {
     this.borderGeometry = new TorusGeometry(this.tileSize, this.borderSize, 2, 6);
     this.borderMaterial = new MeshBasicMaterial({color: new Color(this.borderColor)});
-    this.borderMesh = new InstancedMesh(this.borderGeometry, this.borderMaterial, this.tesselation.size);
+    this.borderMesh = new InstancedMesh(this.borderGeometry, this.borderMaterial, 1 + 3 * this.size * (this.size + 1));
   }
 
   #genHexagonMesh() {
     this.hexagonGeometry = new CircleGeometry(this.tileSize - this.borderSize, 6);
     this.hexagonMaterial = new MeshBasicMaterial({color: new Color(this.alivesColorArray[0])});
     this.hexagonMaterial.side = DoubleSide;
-    this.hexagonMesh = new InstancedMesh(this.hexagonGeometry, this.hexagonMaterial, this.tesselation.size);
+    this.hexagonMesh = new InstancedMesh(this.hexagonGeometry, this.hexagonMaterial, 1 + 3 * this.size * (this.size + 1));
   }
 
-  #genTessalation() {
+
+
+  #genTesselation() {
     this.tesselation = new Map();
-    const size = this.radius - 1;
-    for (let q = -size; q <= size; q++) {
-      for (let r = Math.max(-size, -q - size); r <= Math.min(size, -q + size); r++) {
-        this.tesselation.set(`${q},${r}`, {
+    for (let q = -this.size; q <= this.size; q++) {
+      this.tesselation.set(q, new Map());
+      for (let r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r++) {
+        this.tesselation.get(q).set(r, {
           q,
           r,
           alive: Math.random() < this.probAlive ?
@@ -157,21 +155,25 @@ export default class HexagonTesselationAutomaton extends Component {
   }
 
   #getNbAliveNeighbors(q, r) {
-    const current = this.tesselation.get(`${q},${r}`);
+    const current = this.tesselation.get(q).get(r);
     let toCount = current.alive;
     const coords = [
+      {q: 0, r: -1},
+      {q: 0, r: +1},
       {q: +1, r: 0},
       {q: +1, r: -1},
-      {q: 0, r: -1},
       {q: -1, r: 0},
       {q: -1, r: +1},
-      {q: 0, r: +1},
     ];
     let cmptAlive = 0;
     if (toCount == 0) toCount++; //for dead cells, count all alive cells around
     for (const coord of coords) {
-      const neighbor = this.tesselation.get(`${q + coord.q},${r + coord.r}`);
-      if (neighbor && neighbor.alive >= toCount) cmptAlive++;
+      let col = this.tesselation.get(q + coord.q);
+      // if (!col) continue; //"torus" get the other side of the map
+      if (!col) col = this.tesselation.get(-q);
+      const neighbor = col.get(r + coord.r);
+      if (!neighbor) continue; // "torus" get the other side of the map
+      if (neighbor.alive >= toCount) cmptAlive++;
     }
     return cmptAlive;
   }

@@ -79,7 +79,7 @@ const fireworks = {
 };
 
 const fire = {
-  probAlive: 0.7,
+  probAlive: 0.58,
   birthRule: [4, 6],
   survivalRule: [2, 4, 5, 6],
   borderSize: 0,
@@ -110,7 +110,7 @@ const clusters = {
   nbLifes: 6,
 };
 
-const options = lavaShard;
+const options = maze;
 
 const hexagons = world.create(
   [HexagonTesselationAutomaton, {
@@ -121,7 +121,7 @@ const hexagons = world.create(
 );
 
 const anim = tweens.create({
-  duration: 1000/30,
+  duration: 1000/60,
   loop: true,
   animate : progress => {
     if (progress != 1) return
