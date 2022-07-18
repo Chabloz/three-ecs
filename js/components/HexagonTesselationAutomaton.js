@@ -168,11 +168,10 @@ export default class HexagonTesselationAutomaton extends Component {
     let cmptAlive = 0;
     if (toCount == 0) toCount++; //for dead cells, count all alive cells around
     for (const coord of coords) {
-      let col = this.tesselation.get(q + coord.q);
+      const col = this.tesselation.get(q + coord.q);
       if (!col) continue;
       const neighbor = col.get(r + coord.r);
-      if (!neighbor) continue;
-      if (neighbor.alive >= toCount) cmptAlive++;
+      if (neighbor && neighbor.alive >= toCount) cmptAlive++;
     }
     return cmptAlive;
   }
