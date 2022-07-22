@@ -1,6 +1,5 @@
 import Component from './Component.js';
 import { DirectionalLight, Color }  from '../lib/three/build/three.module.js';
-import ThreeEntity from '../entities/ThreeEntity.js';
 
 export default class LightDirectional extends Component {
   #light
